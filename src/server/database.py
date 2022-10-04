@@ -1,9 +1,9 @@
-from os import environ
+from decouple import config
 from motor.motor_asyncio import AsyncIOMotorClient
 
 class DataBase:
     client: AsyncIOMotorClient = None
-    database_uri = environ.get("DATABASE_URI")
+    database_uri = config("DATABASE_URI")
     users_db = None
     addresses_db = None
     products_db = None

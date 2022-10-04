@@ -1,6 +1,8 @@
+import asyncio
 from fastapi import FastAPI
 from src.routers import api_router
 from fastapi.middleware.cors import CORSMiddleware
+from src.server.database import db
 
 
 # criando aplicação
