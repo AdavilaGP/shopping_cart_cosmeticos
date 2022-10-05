@@ -8,9 +8,3 @@ class Address(BaseModel):
     city: str
     state: str
     is_delivery: bool = Field(default=True)
-
-
-class AddressSchema(BaseModel):
-    # user: UserSchema
-    address: List[Address] = []
-    
