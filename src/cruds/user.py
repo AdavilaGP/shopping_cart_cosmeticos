@@ -1,6 +1,6 @@
 import logging
 from fastapi import status, HTTPException
-from utils import Hash, get_field_or_404
+from src.utils import Hash, get_field_or_404
 from src.schemas.users import UserSchema
 from src.server.database import db
 from email_validator import validate_email, EmailNotValidError
@@ -9,8 +9,8 @@ logger = logging.getLogger(__name__)
 
 async def create_user(user: UserSchema):
     try:
-        password = Hash.encrypt(user.password)
-        user.password = password
+        # password = Hash.encrypt(user.password)
+        # user.password = password
 
         new_account = True
         try:
@@ -25,10 +25,10 @@ async def create_user(user: UserSchema):
             print("Password not valid")
 
         else:
-            user = await db.user_db.insert_one(user.dict()) #insere no db
+            user = await db.users_db.insert_one(user.dict()) # insere no db
 
         if user.inserted_id:
-            user = await get_field_or_404(user.inserted_id, db.user_db, 'user')
+            user = await get_field_or_404(user.inserted_id, db.users_db, 'user')
 
             return user
 
@@ -38,6 +38,6 @@ async def create_user(user: UserSchema):
         
 
 async def get_user(user_id):
-    user = await get_field_or_404(user_id, db.user_db, 'user')
+    user = await get_field_or_404(user_id, db.users_db, 'user')
 
     return user

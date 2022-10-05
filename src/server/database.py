@@ -1,9 +1,9 @@
-from os import environ
+from src.settings.settings import settings
 from motor.motor_asyncio import AsyncIOMotorClient
 
 class DataBase:
     client: AsyncIOMotorClient = None
-    database_uri = environ.get("DATABASE_URI")
+    database_uri = settings.DATABASE_URI
     users_db = None
     addresses_db = None
     products_db = None
@@ -12,7 +12,7 @@ class DataBase:
 
 db = DataBase()
 
-async def connect_db():
+def connect_db():
     try:
         db.client = AsyncIOMotorClient(
         db.database_uri,
@@ -27,10 +27,8 @@ async def connect_db():
         db.orders_db = db.client.shopping_cart.orders
         db.order_itens_db = db.client.shopping_cart.order_itens
 
-        print(await db.client.server_info())
-
     except Exception:
         print("Unable to connect to the server.")
 
-async def disconnect_db():
+def disconnect_db():
     db.client.close()

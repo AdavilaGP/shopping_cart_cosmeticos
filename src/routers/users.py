@@ -8,5 +8,5 @@ router = APIRouter(tags=['Users'], prefix='/users')
 
 @router.post("/")
 async def create_new_user(user: UserSchema):
-    user = await create_user()
-    return JSONResponse(status_code=status.HTTP_200_OK)
+    user = await create_user(user)
+    return JSONResponse(content={ 'data': {'user': user}},status_code=status.HTTP_200_OK)
