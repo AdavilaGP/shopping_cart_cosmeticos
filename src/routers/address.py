@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status
 from starlette.responses import JSONResponse
-from src.cruds.address import create_address, get_addresses, find_address_by_id
+from src.cruds.address import create_address, get_addresses, find_address_by_id, remove_address_by_id
 from src.schemas.address import Address
 from src.utils import parse_json
 
@@ -23,3 +23,9 @@ async def get_address(user_id: str):
 async def get_address_by_id(user_id: str, address_id: str):
     address = await find_address_by_id(user_id, address_id)
     return JSONResponse(content={'data': {'address': parse_json(address)}}, status_code=status.HTTP_200_OK)
+
+
+@router.delete("/{address_id}")
+async def delete_address_by_id(user_id: str, address_id: str):
+    response = await remove_address_by_id(user_id, address_id)
+    return JSONResponse(content={'data': {'address': response}}, status_code=status.HTTP_200_OK)
