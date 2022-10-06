@@ -33,7 +33,7 @@ async def create_address(user_id: str, address: Address):
                 {'_id': user_address['_id']},
                 {
                     '$addToSet': {
-                        'address': address
+                        'address': dict(sorted(address.items()))
                     }
                 }
             )
@@ -45,7 +45,7 @@ async def create_address(user_id: str, address: Address):
             {
                 'user': user,
                 'address': [
-                    address
+                    dict(sorted(address.items()))
                 ]
             }
         )
@@ -54,3 +54,19 @@ async def create_address(user_id: str, address: Address):
     except Exception as e:
         print(f'create_address.error: {e}')
 
+
+async def find_address_by_id(user_id, address_id):
+    try:
+        user_address = await db.addresses_db.find_one({'user._id': ObjectId(user_id)})
+        
+        if user_address:
+            address_list = user_address['address']
+            address = [v for v in address_list if v['_id'] == ObjectId(address_id)]
+            if address:
+                return address
+            raise Exception("Endereço não encontrado")
+        
+        raise Exception("Usuário ou endereço não encontrados")
+        
+    except Exception as e:
+        print(f'get_address_by_id.error: {e}')
