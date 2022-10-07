@@ -10,7 +10,7 @@ router = APIRouter(tags=["Address"], prefix="/user/{user_id}/address")
 @router.post("/")
 async def create_new_address(address: Address, user_id: str):
     address = await create_address(user_id, address)
-    return JSONResponse(content={'data': address}, status_code=status.HTTP_200_OK)
+    return JSONResponse(content={'data': address}, status_code=status.HTTP_201_CREATED)
 
 
 @router.get("/")
