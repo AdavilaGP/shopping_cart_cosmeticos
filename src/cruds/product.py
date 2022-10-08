@@ -6,12 +6,24 @@ from fastapi import status, HTTPException
 from src.schemas.products import ProductSchema
 from src.server.database import db
 from src.server.validation import validate_object_id
+from src.utils import get_field_or_404
 
 logger = logging.getLogger(__name__)
 
 async def create_product(product: ProductSchema):
+
+#Verifica se email já existe
+    product_db = await get_product_by_name(product.name)
+    if product_db:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="message': 'Product already registered")
+    
     try:
-        return await db.products_db.insert_one(product.dict())
+        product = await db.products_db.insert_one(product.dict())
+
+    #Verifica ObjectId
+        if product.inserted_id:
+            product = await get_field_or_404(product.inserted_id, db.products_db, 'product')
+            return product
     except Exception as e:
         logger.exception(f'create_product.error: {e}')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)

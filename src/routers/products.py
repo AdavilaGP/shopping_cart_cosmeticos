@@ -10,7 +10,7 @@ router = APIRouter(tags=['Products'], prefix='/products')
 @router.post("/")
 async def create_new_product(product: ProductSchema):
     product = await create_product(product)
-    return JSONResponse(content={ 'data': {'product_id': str(product.inserted_id)}},status_code=status.HTTP_200_OK)
+    return JSONResponse(content={ 'data': {'product': product}},status_code=status.HTTP_200_OK)
 
 @router.delete("/{id}")
 async def delete_product_id(id: str):
