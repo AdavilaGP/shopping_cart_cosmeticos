@@ -1,0 +1,21 @@
+POST http://localhost:8000/users/
+
+{
+    "email": "ada.teste@gmail.com",
+    "password": "234oi67",
+    "is_active": true,
+    "is_admin": false
+}
+
+###
+POST http://localhost:8000/users/
+
+{
+    "email": "ada.teste@gmail.com",
+    "password": "27",
+    "is_active": true,
+    "is_admin": false
+}
+
+###
+GET http://localhost:8000/users/ada.teste@gmail.com
