@@ -1,5 +1,4 @@
 import datetime
-from typing import List
 from pydantic import BaseModel, Field
 from bson.objectid import ObjectId
 
@@ -36,6 +35,7 @@ class ProductItemsSchema(BaseModel):
         
         
 class OrderSchema(BaseModel):
+    order_id: PyObjectId = Field(default_factory=PyObjectId)
     user: dict
     address: dict
     price: float

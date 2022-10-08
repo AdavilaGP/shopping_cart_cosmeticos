@@ -8,6 +8,5 @@ router = APIRouter(tags=["Orders"], prefix="/orders")
 
 @router.post("/")
 async def add_order_item(item: AddItemSchema):
-    order = await add_item_to_order(item)
-    print(order)
-    return JSONResponse(content={'data': {'order': parse_json(order)}}, status_code=status.HTTP_200_OK)
+    order_item =  await add_item_to_order(item)
+    return JSONResponse(content={'data': parse_json(order_item)}, status_code=status.HTTP_201_CREATED)
