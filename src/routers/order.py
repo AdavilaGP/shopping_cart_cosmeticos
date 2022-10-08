@@ -1,13 +1,13 @@
 from fastapi import APIRouter, status
 from starlette.responses import JSONResponse
-#from src.cruds.order import create_address, get_addresses
-#from src.schemas.order import Address
+from src.schemas.order import AddItemSchema
 from src.utils import parse_json
-from src.cruds.order import create_new_order
+from src.cruds.order import add_item_to_order
 
-router = APIRouter(tags=["Orders"], prefix=["/orders"])
+router = APIRouter(tags=["Orders"], prefix="/orders")
 
-@router.post("/{user_id}/{product_id}")
-async def create_order(user_id: str, product_id: str):
-    order = await create_new_order(user_id,product_id)
-
+@router.post("/")
+async def add_order_item(item: AddItemSchema):
+    order = await add_item_to_order(item)
+    print(order)
+    return JSONResponse(content={'data': {'order': parse_json(order)}}, status_code=status.HTTP_200_OK)

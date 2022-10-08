@@ -25,7 +25,7 @@ def connect_db():
         db.addresses_db = db.client.shopping_cart.addresses
         db.products_db = db.client.shopping_cart.products
         db.orders_db = db.client.shopping_cart.orders
-        db.order_itens_db = db.client.shopping_cart.order_itens
+        db.order_items_db = db.client.shopping_cart.order_items
 
     except Exception:
         print("Unable to connect to the server.")
