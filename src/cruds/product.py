@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 async def create_product(product: ProductSchema):
 
-#Verifica se email já existe
+    #Verifica se produto já existe
     product_db = await get_product_by_name(product.name)
     if product_db:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="message': 'Product already registered")
@@ -43,11 +43,11 @@ async def delete_product(product_id: str):
 async def get_product_by_id(product_id: str):
     return await get_field_or_404(product_id, db.products_db, 'product')
 
-async def get_product_by_name(product_name: str):
+async def get_product_by_name(product_name: str, skip: int, limit: int):
     try:
         pydantic.json.ENCODERS_BY_TYPE[ObjectId] = str #fix objectId and FastAPI conflict
-        cursor = db.products_db.find({'name': {'$regex': product_name}})
-        products = await cursor.to_list(length = 5)
+        cursor = db.products_db.find({'name': {'$regex': product_name}}).skip(int(skip)).limit(int(limit))
+        products = await cursor.to_list(length = int(limit))
         if products:
             return products
     except Exception as e:

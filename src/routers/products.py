@@ -23,8 +23,8 @@ async def get_product_id(product_id: str):
     return JSONResponse(content={'data': {'product': product}}, status_code=status.HTTP_200_OK)
 
 @router.get("/name/{product_name}")
-async def get_product_name(product_name: str):
-    product = await get_product_by_name(product_name)
+async def get_product_name(product_name: str, skip: int = 0, limit: int = 10):
+    product = await get_product_by_name(product_name, skip, limit)
     return JSONResponse(content={'data': parse_json(product)}, status_code=status.HTTP_200_OK)
 
 @router.put("/{product_id}")
