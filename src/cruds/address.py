@@ -64,6 +64,7 @@ async def create_address(user_email: str, address: AddressSchema):
 
 
 async def find_address_by_id(user_email: str, address_id: str):
+    address = await get_delivery_address(user_email)
     user_address = await check_user_address(user_email)
     address_list = user_address['address']
     address = [v for v in address_list if v['_id'] == ObjectId(address_id)]
@@ -88,3 +89,12 @@ async def remove_address_by_id(user_email: str, address_id: str):
     raise HTTPException(status_code=status.HTTP_304_NOT_MODIFIED)
     # TODO: alterar pedidos abertos que tenham o endereço removido como endereço de entrega
 
+
+async def get_delivery_address(user_email):
+    pipeline = [
+        {'$match': {'user.email': user_email }},
+        {'$unwind': '$address'},
+        {'$match': {'address.is_delivery': True}}
+    ]
+    return await db.addresses_db.aggregate(pipeline).to_list(length=None)
+ 
