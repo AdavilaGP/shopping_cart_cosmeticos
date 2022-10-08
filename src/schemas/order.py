@@ -25,25 +25,16 @@ class AddItemSchema(BaseModel):
     product_id: PyObjectId = Field(default_factory=PyObjectId)
     product_quantity: int
     
-    
-class ProductItemsSchema(BaseModel):
-    product_id: PyObjectId = Field(default_factory=PyObjectId)
-    name: str
-    description: str
-    price: float
-    quantity: int
-        
-        
+      
 class OrderSchema(BaseModel):
-    order_id: PyObjectId = Field(default_factory=PyObjectId)
-    user: dict
-    address: dict
+    user_id: PyObjectId = Field(default_factory=PyObjectId)
+    address_id: PyObjectId = Field(default_factory=PyObjectId)
     price: float
     paid: bool = Field(default=False)
     create: datetime.datetime = Field(default=datetime.datetime.now())
 
     
 class OrderItemSchema(BaseModel):
-    order: OrderSchema
-    product: ProductItemsSchema
+    order: dict
+    product: dict
     

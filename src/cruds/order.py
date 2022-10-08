@@ -1,6 +1,6 @@
 import logging
 from fastapi import HTTPException, status
-from src.schemas.order import OrderSchema, OrderItemSchema, ProductItemsSchema
+from src.schemas.order import OrderSchema, OrderItemSchema
 from src.server.database import db
 from bson.objectid import ObjectId
 
@@ -32,15 +32,7 @@ async def create_order_item(order, product_id, product_quantity):
         product = await db.products_db.find_one({'_id': ObjectId(product_id)})
         if not product:
             raise HTTPException(detail='Produto não encontrado', status_code=status.HTTP_404_NOT_FOUND)
-        
-        product = ProductItemsSchema(
-            product_id=product_id, 
-            name=product['name'], 
-            description=product['description'],
-            price=product['price'],
-            quantity=product_quantity
-        )
-        order_item = OrderItemSchema(order=order, product=product)
+        order_item = OrderItemSchema(order={'_id': order['_id']}, product={'_id': product_id, 'quantity': product_quantity})
         order_item = await db.order_items_db.insert_one(order_item.dict())
         return await get_order_item_by_id(order_item.inserted_id)
 
@@ -48,7 +40,7 @@ async def create_order_item(order, product_id, product_quantity):
 async def get_opened_order_by_user_id(user_id):
     # TODO checar se o pedido está aberto ou não (paid=True -> fechado, paid=False -> aberto)
     try:
-        return await db.orders_db.find_one({'user._id': ObjectId(user_id)})
+        return await db.orders_db.find_one({'user_id': ObjectId(user_id)})
     except Exception as e:
         logger.exception(f'get_opened_order_by_user_id.error: {e}')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
@@ -78,7 +70,7 @@ async def add_item_to_order(item):
         raise HTTPException(detail='Não existe endereço de entrega padrão para este usuário', status_code=status.HTTP_404_NOT_FOUND)
     
     # TODO calcular preço do pedido
-    new_order = OrderSchema(user=user, price=0, address=delivery_address)
+    new_order = OrderSchema(user_id=user['_id'], price=0, address_id=delivery_address['_id'])
     new_order = await db.orders_db.insert_one(new_order.dict())
     created_order = await get_order_by_id(new_order.inserted_id)
     if created_order:
