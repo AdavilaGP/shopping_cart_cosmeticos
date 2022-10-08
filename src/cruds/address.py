@@ -1,4 +1,4 @@
-from src.schemas.address import Address
+from src.schemas.address import AddressSchema
 from bson.objectid import ObjectId
 from src.server.database import db
 
@@ -22,7 +22,7 @@ async def get_addresses(user_id):
         print(f'get_address.error: {e}')
 
 
-async def create_address(user_id: str, address: Address):
+async def create_address(user_id: str, address: AddressSchema):
     try:
         user_address = await get_addresses(user_id)
         address = address.dict()

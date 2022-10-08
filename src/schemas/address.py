@@ -1,7 +1,6 @@
-from typing import List
 from pydantic import BaseModel, Field
 
-class Address(BaseModel):
+class AddressSchema(BaseModel):
     street: str
     cep: str
     district: str
