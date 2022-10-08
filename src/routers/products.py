@@ -21,7 +21,7 @@ async def get_product_name(product_name: str):
     product = await get_product_by_name(product_name)
     return JSONResponse(content={'data': parse_json(product)}, status_code=status.HTTP_200_OK)
 
-# @router.put("/{product_id}")
-# async def update_product_id(product_data, product_id: str):
-#     data = await update_product(product_data, product_id)
-#     return JSONResponse(content={'data': data}, status_code=status.HTTP_200_OK)
+@router.put("/{product_id}")
+async def update_product_by_id(product_data: dict, product_id: str):
+    data = await update_product(product_data, product_id)
+    return JSONResponse(content={'modified_product': parse_json(data)}, status_code=status.HTTP_200_OK)

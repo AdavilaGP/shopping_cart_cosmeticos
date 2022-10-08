@@ -30,18 +30,15 @@ async def get_product_by_name(product_name: str):
         logger.exception(f'get_product_by_name.error: {e}')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
-async def update_product(product_id: str, product_data):
+async def update_product(product_data: dict, product_id: str):
     try:
-        data = {k: v for k, v in product_data.items() if v is not None}
-        print(data)
-
         product = await db.products_db.update_one(
             {'_id': validate_object_id(product_id)},
-            {'$set': data}
+            {'$set': product_data}
         )
 
         if product.modified_count:
-            return get_product_by_id(product_id)
+            return await get_product_by_id(product_id)
 
     except Exception as e:
         logger.exception(f'update_product.error: {e}')
