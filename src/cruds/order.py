@@ -46,12 +46,28 @@ async def get_order_by_id(order_id):
     
 
 async def create_order_item(order, product_id, product_quantity):
-    # TODO checar se já existe esse produto no pedido e se sim aumentar a quantidade e atualizar preço do order_item
+    if product_quantity < 1:
+        raise HTTPException(detail='Quantidade não pode ser menor que 1', status_code=status.HTTP_400_BAD_REQUEST)
+    
     product = await db.products_db.find_one({'_id': ObjectId(product_id)})
     if not product:
         raise HTTPException(detail='Produto não encontrado', status_code=status.HTTP_404_NOT_FOUND)
+    
     updated_price = order['price'] + (product['price'] * product_quantity)
     await update_total_order_price(order['_id'], updated_price)
+    
+    order_item = await db.order_items_db.find_one(
+        { '$and': [{'order_id': order['_id']}, {'product._id': product_id}]}
+    )
+    if order_item:
+        updated_quantity = order_item['product']['quantity'] + product_quantity
+        updated_order_item = await db.order_items_db.update_one(
+            {'_id': order_item['_id']},
+            {'$set': {'product.quantity': updated_quantity}}
+        )
+        if updated_order_item.modified_count:
+            return await get_order_item_by_id(order_item['_id'])
+    
     order_item = OrderItemSchema(order_id=order['_id'], product={'_id': product_id, 'quantity': product_quantity})
     order_item = await db.order_items_db.insert_one(order_item.dict())
     return await get_order_item_by_id(order_item.inserted_id)
@@ -75,5 +91,4 @@ async def add_item_to_order(item):
     created_order = await get_order_by_id(new_order.inserted_id)
     if created_order:
         return await create_order_item(created_order, item.product_id, item.product_quantity)
-    
-    
+
