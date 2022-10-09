@@ -6,6 +6,7 @@ from src.schemas.order import OrderSchema, OrderItemSchema
 from src.server.database import db
 from bson.objectid import ObjectId
 from src.cruds.address import get_delivery_address
+from src.cruds.user import get_user_by_email
 
 logger = logging.getLogger(__name__)
 
@@ -25,15 +26,15 @@ async def update_total_order_price(order_id, price):
     )
     
 
-async def get_order_by_paid_status(user_id, status):
+async def get_order_by_paid_status(user_id, order_status):
     try:
-        pipeline = [
-            {'$match': {'user_id': user_id }},
-            {'$match': {'paid': status }}
-        ]
-        return await db.orders_db.aggregate(pipeline).to_list(length=None)
+        order_status = False if order_status == "opened" else True
+        return await db.orders_db.find(
+            {'$and': [{'user_id': user_id}, {'paid': order_status}]}
+        ).to_list(length= None)
+        
     except Exception as e:
-        logger.exception(f'get_opened_order.error: {e}')
+        logger.exception(f'get_order_by_paid_status.error: {e}')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
 
@@ -73,12 +74,12 @@ async def create_order_item(order, product_id, product_quantity):
     return await get_order_item_by_id(order_item.inserted_id)
 
     
-async def add_item_to_order(item):
-    user = await db.users_db.find_one({'_id': ObjectId(item.user_id)})
+async def add_item_to_order(user_email, item):
+    user = await get_user_by_email(user_email)
     if not user:
         raise HTTPException(detail='Usuário não encontrado', status_code=status.HTTP_404_NOT_FOUND)
     
-    opened_order = await get_order_by_paid_status(item.user_id, False)
+    opened_order = await get_order_by_paid_status(user['_id'], False)
     if opened_order:
         return await create_order_item(opened_order[0], item.product_id, item.product_quantity)
             
@@ -91,4 +92,28 @@ async def add_item_to_order(item):
     created_order = await get_order_by_id(new_order.inserted_id)
     if created_order:
         return await create_order_item(created_order, item.product_id, item.product_quantity)
+
+
+async def get_orders_by_user_email(user_email, order_status):
+    user = await get_user_by_email(user_email)
+    if not user:
+        raise HTTPException(detail='Usuário não encontrado', status_code=status.HTTP_404_NOT_FOUND)
+    
+    orders = await get_order_by_paid_status(user['_id'], order_status)
+    if not orders:
+        raise HTTPException(detail='Nenhum pedido encontrado', status_code=status.HTTP_404_NOT_FOUND)
+    for order in orders:
+        order_items = await db.order_items_db.find(
+        {'order_id': order['_id']},
+        {'product': 1}
+        ).to_list(length=None)
+        order['items'] = order_items
+    return orders
+
+
+# user 1: 632f955d05f8a6b497416823
+# user 2: 633e0891443a2bf22947179d
+# product 1: 633f6144da7ebbccd1b22bbe
+# product 2: 633f63e1977580b5b3f2b25f
+
 

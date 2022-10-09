@@ -20,8 +20,7 @@ class PyObjectId(ObjectId):
         field_schema.update(type="string")
         
 
-class AddItemSchema(BaseModel):
-    user_id: PyObjectId = Field(default_factory=PyObjectId)
+class ItemSchema(BaseModel):
     product_id: PyObjectId = Field(default_factory=PyObjectId)
     product_quantity: int
     
