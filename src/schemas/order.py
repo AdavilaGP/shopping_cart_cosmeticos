@@ -35,6 +35,6 @@ class OrderSchema(BaseModel):
 
     
 class OrderItemSchema(BaseModel):
-    order: dict
+    order_id: PyObjectId = Field(default_factory=PyObjectId)
     product: dict
     
