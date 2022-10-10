@@ -1,0 +1,18 @@
+# Criando pedido / Adicionando item a um pedido aberto
+POST http://localhost:8000/orders/vanessa@gmail.com
+
+{
+    "product_id": "633f63e1977580b5b3f2b25f",
+    "product_quantity": 1
+}
+
+###
+
+# Buscando por pedido aberto do usuário
+GET http://localhost:8000/orders/vanessa@gmail.com/order/?order_status=opened
+
+###
+
+# Buscando por pedidos fechados do usuário
+
+GET http://localhost:8000/orders/vanessa@gmail.com/order/?order_status=closed

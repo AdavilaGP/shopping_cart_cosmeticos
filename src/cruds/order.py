@@ -1,6 +1,6 @@
 import logging
 from fastapi import HTTPException, status
-from src.schemas.order import OrderSchema, OrderItemSchema
+from src.schemas.order import ItemListSchema, OrderSchema, OrderItemSchema
 from src.server.database import db
 from bson.objectid import ObjectId
 from src.cruds.address import get_delivery_address
@@ -86,7 +86,7 @@ async def add_item_to_order(user_email, item):
     if not user:
         raise HTTPException(detail='Usuário não encontrado', status_code=status.HTTP_404_NOT_FOUND)
     
-    opened_order = await get_order_by_paid_status(user['_id'], False)
+    opened_order = await get_order_by_paid_status(user['_id'], "opened")
     if opened_order:
         return await create_order_item(opened_order[0], item.product_id, item.product_quantity)
             
@@ -111,25 +111,36 @@ async def get_orders_by_user_email(user_email, order_status):
     if not user:
         raise HTTPException(detail='Usuário não encontrado', status_code=status.HTTP_404_NOT_FOUND)
     
+    if order_status != "opened" and order_status != "closed":
+        raise HTTPException(detail='Status inválido', status_code=status.HTTP_400_BAD_REQUEST)
+    
     orders = await get_order_by_paid_status(user['_id'], order_status)
     if not orders:
         raise HTTPException(detail='Nenhum pedido encontrado', status_code=status.HTTP_404_NOT_FOUND)
     
     try:
+        order_items_list = []
         for order in orders:
             order_items = await db.order_items_db.find(
                 {'order_id': order['_id']},
                 {'product': 1}
             ).to_list(length=None)
             
-            for item in order_items:
-                order_items_info = await db.products_db.find(
-                    {'_id': item['product']['_id']},
-                    {'name': 1, 'description': 1, 'price': 1}
-                ).to_list(length=None)
-                order_items_info[0]['quantity'] = item['product']['quantity']
+        for item in order_items:
+            item_info = await db.products_db.find(
+                {'_id': item['product']['_id']},
+                {'name': 1, 'description': 1, 'price': 1}
+            ).to_list(length=None)
+            item_list = ItemListSchema(
+                _id=item_info[0]['_id'],
+                name=item_info[0]['name'],
+                description=item_info[0]['description'],
+                price=item_info[0]['price'],
+                quantity=item['product']['quantity']
+            )
+            order_items_list.append(item_list.dict())
                 
-        order['items'] = order_items_info           
+        order['items'] = order_items_list           
         return orders
 
     except Exception as e:
