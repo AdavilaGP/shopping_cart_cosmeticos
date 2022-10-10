@@ -15,14 +15,8 @@ async def add_order_item(user_email: str, item: ItemSchema):
     return JSONResponse(content={'order_item': parse_json(order_item)}, status_code=status.HTTP_201_CREATED)
 
 
-@router.get("/opened")
-async def get_opened_order(user_email: str):
-    order = await get_orders_by_user_email(user_email, order_status="opened")
+@router.get("/order/")
+async def get_opened_order(user_email: str, order_status: str):
+    order = await get_orders_by_user_email(user_email, order_status)
     return JSONResponse(content={'order': parse_json(order)}, status_code=status.HTTP_200_OK)
-
-
-@router.get("/closed")
-async def get_closed_orders(user_email: str):
-    order = await get_orders_by_user_email(user_email, order_status="closed")
-    return JSONResponse(content={'orders': parse_json(order)}, status_code=status.HTTP_200_OK)
 
