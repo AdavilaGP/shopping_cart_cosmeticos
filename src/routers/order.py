@@ -1,10 +1,11 @@
 from fastapi import APIRouter, status
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 from src.schemas.order import ItemSchema
 from src.utils import parse_json
 from src.cruds.order import (
     add_item_to_order, 
     get_orders_by_user_email,
+    remove_item_from_order,
 )
 
 router = APIRouter(tags=["Orders"], prefix="/orders/{user_email}")
@@ -19,4 +20,10 @@ async def add_order_item(user_email: str, item: ItemSchema):
 async def get_opened_order(user_email: str, order_status: str):
     order = await get_orders_by_user_email(user_email, order_status)
     return JSONResponse(content={'order': parse_json(order)}, status_code=status.HTTP_200_OK)
+
+
+@router.delete("/")
+async def remove_order_item(user_email: str, item: ItemSchema):
+    await remove_item_from_order(user_email, item)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 

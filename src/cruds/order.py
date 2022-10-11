@@ -63,7 +63,6 @@ async def create_order_item(order, product_id, product_quantity):
             { '$and': [{'order_id': order['_id']}, {'product._id': product_id}]}
         )
         if order_item:
-            # TODO: subtrair quantidade caso o usuário remova um item do pedido/carrinho
             updated_quantity = order_item['product']['quantity'] + product_quantity
             updated_order_item = await db.order_items_db.update_one(
                 {'_id': order_item['_id']},
@@ -147,3 +146,45 @@ async def get_orders_by_user_email(user_email, order_status):
         logger.exception(f'get_orders_by_user_email.error: {e}')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
+
+async def remove_item_from_order(user_email, item):
+    user = await get_user_by_email(user_email)
+    if not user:
+        raise HTTPException(detail='Usuário não encontrado', status_code=status.HTTP_404_NOT_FOUND)
+    
+    if item.product_quantity < 1:
+        raise HTTPException(detail='Quantidade não pode ser menor que 1', status_code=status.HTTP_400_BAD_REQUEST)
+    
+    product = await db.products_db.find_one({'_id': ObjectId(item.product_id)})
+    if not product:
+        raise HTTPException(detail='Produto não encontrado', status_code=status.HTTP_404_NOT_FOUND)
+    
+    opened_order = await get_order_by_paid_status(user['_id'], "opened")
+    if opened_order:
+        order_item = await db.order_items_db.find_one(
+            { '$and': [{'order_id': opened_order[0]['_id']}, {'product._id': item.product_id}]}
+        )
+        if not order_item:
+            raise HTTPException(detail='Item não encontrado no pedido', status_code=status.HTTP_404_NOT_FOUND)
+        
+        updated_quantity = order_item['product']['quantity'] - item.product_quantity
+        if updated_quantity < 0:
+            raise HTTPException(detail='Não é possível remover uma quantidade maior do que a quantidade do item existente no pedido', status_code=status.HTTP_400_BAD_REQUEST)
+        
+        if updated_quantity == 0:
+            updated_price = opened_order[0]['price'] - product['price']
+            await update_total_order_price(opened_order[0]['_id'], updated_price)
+            deleted_order_item = await db.order_items_db.delete_one({'_id': order_item['_id']})
+            if deleted_order_item.deleted_count:
+                return {}
+        
+        updated_price = opened_order[0]['price'] - (product['price'] * updated_quantity)
+        await update_total_order_price(opened_order[0]['_id'], updated_price)
+        updated_order_item = await db.order_items_db.update_one(
+            {'_id': order_item['_id']},
+            {'$set': {'product.quantity': updated_quantity}}
+        )
+        if updated_order_item.modified_count:
+            return {}
+    
+    
