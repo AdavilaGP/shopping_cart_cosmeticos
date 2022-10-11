@@ -50,7 +50,6 @@ async def delete_user_by_id(user_id):
     print(user_id)
     user = await db.users_db.find_one({'_id': ObjectId(user_id)})
     if user:
-        db.users_db.delete_one({'_id': ObjectId(user_id)})
+        db.users_db.update_one({'_id': ObjectId(user_id)}, {'$set': {'is_active': False}})
         return
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="message': 'User do not exist'")
-
