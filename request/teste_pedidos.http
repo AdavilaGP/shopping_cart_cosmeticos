@@ -34,3 +34,10 @@ DELETE http://localhost:8000/orders/vanessa@gmail.com
     "product_id": "633f6144da7ebbccd1b22bbe",
     "product_quantity": 1
 }
+
+###
+
+# Excluindo um pedido (abertou ou fechado) e removendo os itens dele
+
+DELETE http://localhost:8000/orders/vanessa@gmail.com/order/6346d034e397bab6e1d103e6
+

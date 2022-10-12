@@ -6,6 +6,7 @@ from src.cruds.order import (
     add_item_to_order, 
     get_orders_by_user_email,
     remove_item_from_order,
+    remove_order_by_id
 )
 
 router = APIRouter(tags=["Orders"], prefix="/orders/{user_email}")
@@ -29,3 +30,8 @@ async def remove_order_item(user_email: str, item: ItemSchema):
     await remove_item_from_order(user_email, item)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
+
+@router.delete("/order/{order_id}")
+async def remove_order(user_email: str, order_id: str):
+    await remove_order_by_id(user_email, order_id)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
