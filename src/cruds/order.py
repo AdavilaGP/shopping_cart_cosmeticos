@@ -28,6 +28,16 @@ async def get_order_item_by_product_and_order_id(order_id, product_id):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
 
+async def get_order_items_by_order_id(order_id):
+    try:
+        return await db.order_items_db.find(
+            {'order_id': ObjectId(order_id)}
+        ).to_list(length=None)
+    except Exception as e:
+        logger.exception(f'get_order_item_by_order_id.error: {e}')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+
+
 async def get_order_by_paid_status(user_id, order_status):
     try:
         order_status = False if order_status == "opened" else True
@@ -41,7 +51,7 @@ async def get_order_by_paid_status(user_id, order_status):
 
 async def get_order_by_id(order_id):
     try: 
-        return await db.orders_db.find_one({'_id': order_id})
+        return await db.orders_db.find_one({'_id': ObjectId(order_id)})
     except Exception as e:
         logger.exception(f'get_order_by_id.error: {e}')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
@@ -210,4 +220,24 @@ async def remove_item_from_order(user_email, item):
         logger.exception(f'get_orders_by_user_email.error: {e}')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
         
-        
+
+async def remove_order_by_id(user_email, order_id):
+    user = await get_user_by_email(user_email)
+    if not user:
+        raise HTTPException(detail='Usuário não encontrado', status_code=status.HTTP_404_NOT_FOUND)
+    
+    order = await get_order_by_id(order_id)
+    if not order:
+        raise HTTPException(detail='Pedido não encontrado', status_code=status.HTTP_404_NOT_FOUND)
+    
+    try:
+        deleted_order = await db.orders_db.delete_one({'_id': ObjectId(order_id)})
+        if deleted_order.deleted_count:
+            order_items = await get_order_items_by_order_id(order_id)
+            if order_items:
+                await db.order_items_db.delete_many({'order_id': ObjectId(order_id)})
+                return {}
+                
+    except Exception as e:
+        logger.exception(f'remove_order_by_id.error: {e}')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
