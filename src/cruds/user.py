@@ -3,6 +3,7 @@ from src.utils import Hash, get_field_or_404
 from src.schemas.users import UserSchema
 from src.server.database import db
 from email_validator import validate_email, EmailNotValidError
+from bson.objectid import ObjectId
 
 
 async def create_user(user: UserSchema):
@@ -12,7 +13,6 @@ async def create_user(user: UserSchema):
         new_account = True
         validation = validate_email(user.email, check_deliverability=new_account)
         user.email = validation.email
-        print("3")
 
     except EmailNotValidError as e:
         print(str(e)) 
@@ -23,7 +23,6 @@ async def create_user(user: UserSchema):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="message': 'Email already registered")
 
 #Verifica se senha é válida
-    print("4")
     len_password = 3
     if len_password > len(user.password):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="message': 'Password not valid")
@@ -40,11 +39,17 @@ async def get_user_by_email(user_email):
     try:
         user = await db.users_db.find_one({'email': user_email})
         if user:
-            print('iogiu')
             return user
 
     except Exception as e:
          print(f"get_user.error: {e}")
          raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
-    
 
+
+async def delete_user_by_id(user_id):
+    print(user_id)
+    user = await db.users_db.find_one({'_id': ObjectId(user_id)})
+    if user:
+        db.users_db.update_one({'_id': ObjectId(user_id)}, {'$set': {'is_active': False}})
+        return
+    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="message': 'User do not exist'")
