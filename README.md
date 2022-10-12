@@ -45,7 +45,7 @@ uvicorn main:app --reload
 ```
 Após abrir o servidor local no navegador basta acessar a rota users na URL para ver a aplicação funcionando.
 ```
-http://127.0.0.1:8000/users/
+http://127.0.0.1:8000/
 ```
 ## :handshake: Colaboradoras
 <table>
