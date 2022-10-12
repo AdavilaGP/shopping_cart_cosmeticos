@@ -1,4 +1,5 @@
 import logging
+from operator import length_hint
 from fastapi import HTTPException, status
 from src.schemas.order import ItemListSchema, OrderSchema, OrderItemSchema
 from src.server.database import db
@@ -21,7 +22,7 @@ async def update_total_order_price(order_id, price):
     try: 
         return await db.orders_db.update_one(
             {'_id': order_id},
-            {'$set': {'price': price}}
+            {'$set': {'price': round(price, 3)}}
         )
     except Exception as e:
         logger.exception(f'update_total_order_price.error: {e}')
@@ -46,6 +47,17 @@ async def get_order_by_id(order_id):
         logger.exception(f'get_order_by_id.error: {e}')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
     
+    
+async def update_order_item_quantity(order_item_id, updated_quantity):
+    try:
+        return await db.order_items_db.update_one(
+            {'_id': order_item_id},
+            {'$set': {'product.quantity': updated_quantity}}
+        )
+    except Exception as e:
+        logger.exception(f'update_order_item.error: {e}')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+
 
 async def create_order_item(order, product_id, product_quantity):
     if product_quantity < 1:
@@ -155,6 +167,7 @@ async def remove_item_from_order(user_email, item):
     if item.product_quantity < 1:
         raise HTTPException(detail='Quantidade não pode ser menor que 1', status_code=status.HTTP_400_BAD_REQUEST)
     
+    # TODO: substituir por método que busca produto por id
     product = await db.products_db.find_one({'_id': ObjectId(item.product_id)})
     if not product:
         raise HTTPException(detail='Produto não encontrado', status_code=status.HTTP_404_NOT_FOUND)
@@ -166,25 +179,28 @@ async def remove_item_from_order(user_email, item):
         )
         if not order_item:
             raise HTTPException(detail='Item não encontrado no pedido', status_code=status.HTTP_404_NOT_FOUND)
+         
+        if item.product_quantity > order_item['product']['quantity']:
+            raise HTTPException(detail='Não é possível remover uma quantidade maior do que a existente no pedido', status_code=status.HTTP_400_BAD_REQUEST)
         
-        updated_quantity = order_item['product']['quantity'] - item.product_quantity
-        if updated_quantity < 0:
-            raise HTTPException(detail='Não é possível remover uma quantidade maior do que a quantidade do item existente no pedido', status_code=status.HTTP_400_BAD_REQUEST)
-        
-        if updated_quantity == 0:
-            updated_price = opened_order[0]['price'] - product['price']
+        try:
+            updated_price = opened_order[0]['price'] - (product['price'] * item.product_quantity)
             await update_total_order_price(opened_order[0]['_id'], updated_price)
-            deleted_order_item = await db.order_items_db.delete_one({'_id': order_item['_id']})
-            if deleted_order_item.deleted_count:
-                return {}
-        
-        updated_price = opened_order[0]['price'] - (product['price'] * updated_quantity)
-        await update_total_order_price(opened_order[0]['_id'], updated_price)
-        updated_order_item = await db.order_items_db.update_one(
-            {'_id': order_item['_id']},
-            {'$set': {'product.quantity': updated_quantity}}
-        )
-        if updated_order_item.modified_count:
+            if item.product_quantity == order_item['product']['quantity']:
+                deleted_order_item = await db.order_items_db.delete_one({'_id': order_item['_id']})
+                if deleted_order_item.deleted_count:
+                    order_item = await db.order_items_db.find(
+                        { 'order_id': opened_order[0]['_id']}
+                    ).to_list(length=None)
+                    if not order_item:
+                        await db.orders_db.delete_one({'_id': opened_order[0]['_id']})
+                        return {}   
+            updated_quantity = order_item['product']['quantity'] - item.product_quantity
+            await update_order_item_quantity(order_item['_id'], int(updated_quantity))
             return {}
-    
-    
+        
+        except Exception as e:
+            logger.exception(f'get_orders_by_user_email.error: {e}')
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+        
+        
