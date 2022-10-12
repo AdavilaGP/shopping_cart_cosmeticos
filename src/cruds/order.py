@@ -177,13 +177,18 @@ async def get_orders_by_user_email(user_email, order_status):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
 
-async def close_order(user_id, user_OrderSchema):
+async def close_order(user_email, order_id):
+    user = await get_user_by_email(user_email)
+    if not user:
+        raise HTTPException(detail='Usuário não encontrado', status_code=status.HTTP_404_NOT_FOUND)
+    
+    order = await get_order_by_paid_status(user['_id'], "opened")
+    if not order:
+        raise HTTPException(detail='Pedido não encontrado', status_code=status.HTTP_404_NOT_FOUND)
+    
     try:
-        order = await db.orders_db.find_one({'user_id': user_id})
-        if order:
-            db.orders_db.update_one({'_id': ObjectId(user_id)}, {'$set': {'paid': True}})
-            return
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="message': 'Order do not exist'")
+        await db.orders_db.update_one({'_id': ObjectId(order_id)}, {'$set': {'paid': True}})
+        return await get_order_by_id(order_id)   
 
     except Exception as e:
          print(f"close_order.error: {e}")

@@ -41,3 +41,8 @@ DELETE http://localhost:8000/orders/vanessa@gmail.com
 
 DELETE http://localhost:8000/orders/vanessa@gmail.com/order/6346d034e397bab6e1d103e6
 
+###
+
+# Atualizando um pedido aberto para fechado (paid=False -> Aberto, paid=True -> fechado)
+
+PUT http://localhost:8000/orders/vanessa@gmail.com/order/63472bf567192fe59f662cbf
