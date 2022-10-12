@@ -7,12 +7,6 @@ from src.server.validation import validate_object_id
 
 pwd_encrypted = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-class Hash:
-    def encrypt(self, password):
-        return pwd_encrypted.hash(password)
-
-    def verify(self, password, password_encrypted):
-        return pwd_encrypted.verify(password, password_encrypted)
 
 async def get_field_or_404(id, collection, field):
     data = await collection.find_one({'_id': validate_object_id(id)})
