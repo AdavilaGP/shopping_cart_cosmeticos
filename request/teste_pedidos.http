@@ -2,7 +2,7 @@
 POST http://localhost:8000/orders/vanessa@gmail.com
 
 {
-    "product_id": "633f63e1977580b5b3f2b25f",
+    "product_id": "633f6144da7ebbccd1b22bbe",
     "product_quantity": 1
 }
 
@@ -16,3 +16,33 @@ GET http://localhost:8000/orders/vanessa@gmail.com/order/?order_status=opened
 # Buscando por pedidos fechados do usuário
 
 GET http://localhost:8000/orders/vanessa@gmail.com/order/?order_status=closed
+
+###
+
+# Passando o parâmetro opcional orders_quantity que retorna apenas a quantidade
+# de pedidos encontrados para o usuário
+
+GET http://localhost:8000/orders/vanessa@gmail.com/order/?order_status=closed&orders_quantity=true
+
+###
+
+# Removendo um item do pedido aberto
+
+DELETE http://localhost:8000/orders/vanessa@gmail.com
+
+{
+    "product_id": "633f6144da7ebbccd1b22bbe",
+    "product_quantity": 1
+}
+
+###
+
+# Excluindo um pedido (abertou ou fechado) e removendo os itens dele
+
+DELETE http://localhost:8000/orders/vanessa@gmail.com/order/6346d034e397bab6e1d103e6
+
+###
+
+# Atualizando um pedido aberto para fechado (paid=False -> Aberto, paid=True -> fechado)
+
+PUT http://localhost:8000/orders/vanessa@gmail.com/order/63472bf567192fe59f662cbf
