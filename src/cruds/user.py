@@ -40,7 +40,7 @@ async def get_user_by_email(user_email):
     except Exception as e:
          print(f"get_user.error: {e}")
          raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
-    
+
 
 async def delete_user_by_id(user_id):
     print(user_id)
@@ -49,3 +49,4 @@ async def delete_user_by_id(user_id):
         db.users_db.update_one({'_id': ObjectId(user_id)}, {'$set': {'is_active': False}})
         return
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="message': 'User do not exist'")
+
