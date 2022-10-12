@@ -39,7 +39,7 @@ class OrderItemSchema(BaseModel):
     
 
 class ItemListSchema(BaseModel):
-    _id: PyObjectId = Field(default_factory=PyObjectId)
+    product_id: PyObjectId = Field(default_factory=PyObjectId)
     name: str
     description: str
     price: float
