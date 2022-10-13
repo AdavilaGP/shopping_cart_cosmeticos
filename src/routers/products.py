@@ -1,5 +1,4 @@
 from fastapi import APIRouter, status
-
 from src.cruds.product import create_product, get_product_by_id, get_product_by_name, update_product, delete_product
 from src.schemas.products import ProductSchema
 from starlette.responses import JSONResponse
