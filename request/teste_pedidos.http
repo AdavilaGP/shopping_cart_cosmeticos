@@ -2,8 +2,8 @@
 POST http://localhost:8000/orders/vanessa@gmail.com
 
 {
-    "product_id": "633f6144da7ebbccd1b22bbe",
-    "product_quantity": 1
+    "product_id": "633f652f81ac135fd30193db",
+    "product_quantity": 2
 }
 
 ###
@@ -28,16 +28,11 @@ GET http://localhost:8000/orders/vanessa@gmail.com/order/?order_status=closed&or
 
 # Removendo um item do pedido aberto
 
-DELETE http://localhost:8000/orders/vanessa@gmail.com
-
-{
-    "product_id": "633f6144da7ebbccd1b22bbe",
-    "product_quantity": 1
-}
+DELETE http://localhost:8000/orders/vanessa@gmail.com/order/?product_id=633f652f81ac135fd30193db&product_quantity=1
 
 ###
 
-# Excluindo um pedido (abertou ou fechado) e removendo os itens dele
+# Excluindo um pedido (aberto ou fechado) e removendo os itens dele
 
 DELETE http://localhost:8000/orders/vanessa@gmail.com/order/6346d034e397bab6e1d103e6
 

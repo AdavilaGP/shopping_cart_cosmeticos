@@ -54,11 +54,11 @@ async def delete_user_by_id(user_id):
             for address in addresses['address']:
                 await db.addresses_db.update_many({'address._id': address['_id']}, {'$set': {'address.$.is_active': False}})
 
-        user_orders = await db.orders_db.find({'user_id': user['_id']}).to_list(length=None)
-        if user_orders:
-            for order in user_orders:
+        user_order = await db.orders_db.find({'user_id': user['_id']}, {'paid': False}).to_list(length=None)
+        if user_order:
+            for order in user_order:
                 await db.order_items_db.delete_many({'order_id': ObjectId(order['_id'])})
-                await db.orders_db.delete_many({'user_id': ObjectId(user_id)})  
+                await db.orders_db.delete_one({'user_id': ObjectId(user_id)})  
 
         return {}
     except Exception as e:

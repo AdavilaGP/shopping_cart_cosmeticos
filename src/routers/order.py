@@ -26,9 +26,9 @@ async def get_opened_order(user_email: str, order_status: str, orders_quantity: 
     return JSONResponse(content={'quantidade_pedidos': len(order)}, status_code=status.HTTP_200_OK)
     
 
-@router.delete("/")
-async def remove_order_item(user_email: str, item: ItemSchema):
-    await remove_item_from_order(user_email, item)
+@router.delete("/order/")
+async def remove_order_item(user_email: str, product_id: str, product_quantity: int):
+    await remove_item_from_order(user_email, product_id, product_quantity)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
