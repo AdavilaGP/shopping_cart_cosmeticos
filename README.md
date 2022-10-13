@@ -32,21 +32,51 @@ Projeto <b>Python</b>, utilizando o framework <b>FastAPI</b>, com os registros s
 ![Swagger](https://img.shields.io/badge/-Swagger-%23Clojure?style=for-the-badge&logo=swagger&logoColor=white)
 
 ## Bibliotecas do Python no Projeto
-<i>inserir</i>
+<ul>
+  <li>dnspython</li>
+  <li>email-validator</li>
+  <li>idna</li>
+  <li>install</li>
+  <li>motor</li>
+  <li>pydantic</li>
+  <li>pymongo</li>
+  <li>typing-extensions</li>
+  <li>fastapi</li>
+  <li>uvicorn</li>
+  <li>python-dontenv</li>
+  <li>passlib</li>
+  <li>python-decouple</li>
+</ul>
 
 ## :rocket: Rodando o projeto
-Após fazer o clone do projeto, é necessário fazer a instalação dos requerimentos da aplicação dentro de um ambiente virtual no terminal:
+Após fazer o clone do projeto, é necessário criar um ambiente virtual para executá-lo:
+```
+python3 -m venv venv
+```
+Em seguida, é preciso ativar o ambiente virtual com o comando de acordo com o seu sistema operacional e terminal utilizado:
+```
+source /path/to/venv/bin/activate # Unix ou MacOS com bash shell
+path\to\venv\Scripts\Activate.ps1 # Windows com Powershell
+```
+Para executar o projeto deve-se fazer a instalação dos requerimentos da aplicação dentro do ambiente virtual no terminal:
 ```
 pip install -r requirements.txt
 ```
-Em seguida, basta executar a aplicação em um servidor local utilizado o comando abaixo no terminal: 
+Em seguida, basta executar a aplicação em um servidor local com o comando abaixo: 
 ```
 uvicorn main:app --reload
 ```
-Após abrir o servidor local no navegador basta acessar a rota users na URL para ver a aplicação funcionando.
+Após abrir o servidor local no navegador basta acessar a rota docs na URL para ver a aplicação funcionando:
 ```
-http://127.0.0.1:8000/
+http://localhost:8000/docs
 ```
+
+## :soon: Implementações futuras
+<ul>
+  <li>Realizar testes unitários das rotas e métodos implementados.</li>
+  <li>Fazer verificação de estoque ao adicionar ou remover um item do pedido.</li>
+  <li>Implementar recursos de autorização e autenticação usando JWT.</li>
+</ul>
 ## :handshake: Colaboradoras
 <table>
   <tr>
@@ -94,4 +124,4 @@ http://127.0.0.1:8000/
 </table>
 
 ## :dart: Status do projeto
-Em fase de testes.
+Concluído.
