@@ -5,7 +5,7 @@ from src.server.database import db
 from bson.objectid import ObjectId
 from src.cruds.address import get_delivery_address
 from src.cruds.user import get_user_by_email
-from src.cruds.product import get_product_by_id
+from src.utils import get_field_or_404
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +83,7 @@ async def create_order_item(order, product_id, product_quantity):
     if product_quantity < 1:
         raise HTTPException(detail='Quantidade não pode ser menor que 1', status_code=status.HTTP_400_BAD_REQUEST)
     
-    product = await get_product_by_id(ObjectId(product_id))
+    product = await get_field_or_404(product_id, db.products_db, 'product')
     if not product:
         raise HTTPException(detail='Produto não encontrado', status_code=status.HTTP_404_NOT_FOUND)
     
@@ -203,7 +203,7 @@ async def remove_item_from_order(user_email, item):
     if item.product_quantity < 1:
         raise HTTPException(detail='Quantidade não pode ser menor que 1', status_code=status.HTTP_400_BAD_REQUEST)
     
-    product = await get_product_by_id(ObjectId(item.product_id))
+    product = await get_field_or_404(item.product_id, db.products_db, 'product')
     if not product:
         raise HTTPException(detail='Produto não encontrado', status_code=status.HTTP_404_NOT_FOUND)
     
@@ -258,5 +258,18 @@ async def remove_order_by_id(user_email, order_id):
                 
     except Exception as e:
         logger.exception(f'remove_order_by_id.error: {e}')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+
+
+async def delete_product_from_opened_orders(product_id):
+    try:
+        opened_orders = await db.orders_db.find({'paid': False}).to_list(length=None)
+        if opened_orders:
+            for open_order in opened_orders:
+                items = await get_order_items_by_order_id(open_order['_id'])
+                if items:
+                    return await db.order_items_db.delete({'product._id': product_id})
+    except Exception as e:
+        logger.exception(f'delete_product_from_opened_orders: {e}')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
