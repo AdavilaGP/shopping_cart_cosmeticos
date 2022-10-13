@@ -127,5 +127,5 @@ http://localhost:8000/docs
 ## :dart: Status do projeto
 Concluído.
 <a href="https://shopping-cart-cosmeticos-api.herokuapp.com/docs#/" targt="_blank">Deploy</a> 
-<a href="">Documentação no Swagger</a>
+<a href="https://app.swaggerhub.com/apis-docs/CAMILASENNA/ShoppingCartCosmeticos/1.0.0#/">Documentação no Swagger</a>
 
