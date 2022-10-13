@@ -41,6 +41,5 @@ async def remove_order(user_email: str, order_id: str):
 @router.put("/order/{order_id}")
 async def close_opened_order(user_email, order_id):
     order = await close_order(user_email, order_id)
-    print(order)
     return JSONResponse(content={'order': parse_json(order)}, status_code=status.HTTP_200_OK)
 
