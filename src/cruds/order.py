@@ -259,3 +259,4 @@ async def remove_order_by_id(user_email, order_id):
     except Exception as e:
         logger.exception(f'remove_order_by_id.error: {e}')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+

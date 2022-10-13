@@ -21,8 +21,8 @@ async def get_user(user_email: EmailStr):
     print(user_by_email)
     return JSONResponse(content={'data': {'user': parse_json(user_by_email)}}, status_code=status.HTTP_200_OK)
 
+
 @router.delete("/{user_id}")
 async def delete_user(user_id: str):
     await delete_user_by_id(user_id)
-
-    return JSONResponse(content={'data': parse_json('User deleted')}, status_code=status.HTTP_200_OK)
+    return JSONResponse(content={'data': 'User deleted'}, status_code=status.HTTP_200_OK)

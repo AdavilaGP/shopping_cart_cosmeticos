@@ -8,7 +8,7 @@ POST http://localhost:8000/user/vanessa@gmail.com/address/
     "district" : "São Paulo",
     "city" : "São Paulo",
     "state" : "São Paulo",
-    "is_delivery" : true
+    "is_delivery" : false
 }
 
 ### 
