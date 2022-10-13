@@ -195,15 +195,15 @@ async def close_order(user_email, order_id):
          raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
 
-async def remove_item_from_order(user_email, item):
+async def remove_item_from_order(user_email, product_id, product_quantity):
     user = await get_user_by_email(user_email)
     if not user:
         raise HTTPException(detail='Usuário não encontrado', status_code=status.HTTP_404_NOT_FOUND)
     
-    if item.product_quantity < 1:
+    if product_quantity < 1:
         raise HTTPException(detail='Quantidade não pode ser menor que 1', status_code=status.HTTP_400_BAD_REQUEST)
     
-    product = await get_field_or_404(item.product_id, db.products_db, 'product')
+    product = await get_field_or_404(product_id, db.products_db, 'product')
     if not product:
         raise HTTPException(detail='Produto não encontrado', status_code=status.HTTP_404_NOT_FOUND)
     
@@ -211,17 +211,17 @@ async def remove_item_from_order(user_email, item):
     if not opened_order:
         raise HTTPException(detail='Nenhum pedido aberto encontrado', status_code=status.HTTP_404_NOT_FOUND)
     
-    order_item = await get_order_item_by_product_and_order_id(opened_order[0]['_id'], item.product_id)
+    order_item = await get_order_item_by_product_and_order_id(opened_order[0]['_id'], ObjectId(product_id))
     if not order_item:
         raise HTTPException(detail='Item não encontrado no pedido', status_code=status.HTTP_404_NOT_FOUND)
      
-    if item.product_quantity > order_item['product']['quantity']:
+    if product_quantity > order_item['product']['quantity']:
         raise HTTPException(detail='Não é possível remover uma quantidade maior do que a existente no pedido', status_code=status.HTTP_400_BAD_REQUEST)
     
     try:
-        updated_price = opened_order[0]['price'] - (product['price'] * item.product_quantity)
+        updated_price = opened_order[0]['price'] - (product['price'] * product_quantity)
         await update_total_order_price(opened_order[0]['_id'], updated_price)
-        if item.product_quantity == order_item['product']['quantity']:
+        if product_quantity == order_item['product']['quantity']:
             deleted_order_item = await db.order_items_db.delete_one({'_id': order_item['_id']})
             if deleted_order_item.deleted_count:
                 order_item = await db.order_items_db.find(
@@ -230,7 +230,7 @@ async def remove_item_from_order(user_email, item):
                 if not order_item:
                     await db.orders_db.delete_one({'_id': opened_order[0]['_id']})
                     return {}   
-        updated_quantity = order_item['product']['quantity'] - item.product_quantity
+        updated_quantity = order_item['product']['quantity'] - product_quantity
         await update_order_item_quantity(order_item['_id'], updated_quantity)
         return {}
     

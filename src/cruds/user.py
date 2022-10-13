@@ -23,7 +23,7 @@ async def create_user(user: UserSchema):
     if len_password > len(user.password):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="message': 'Password not valid")
 
-    user = await db.users_db.insert_one(user.dict()) # insere no db
+    user = await db.users_db.insert_one(user.dict())
 
 
     if user.inserted_id:
@@ -60,6 +60,7 @@ async def delete_user_by_id(user_id):
                 await db.order_items_db.delete_many({'order_id': ObjectId(order['_id'])})
                 await db.orders_db.delete_one({'user_id': ObjectId(user_id)})  
 
+        await db.users_db.delete_one({'_id': ObjectId(user_id)})
         return {}
     except Exception as e:
         print(f"delete_user_by_id.error: {e}")

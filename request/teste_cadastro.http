@@ -29,4 +29,4 @@ GET http://localhost:8000/users/aka.teste@gmail.com
 
 #Apagar usuário
 ###
-DELETE http://localhost:8000/users/633f665b0210d406bab5eebf
+DELETE http://localhost:8000/users/63476dafca49a6eb9e9ba6ab

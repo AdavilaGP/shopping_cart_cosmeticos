@@ -4,7 +4,7 @@ POST http://localhost:8000/user/vanessa@gmail.com/address/
 
 {
     "street" : "Rua Quarenta e Sete, Numero 3",
-    "cep" : "15312000",
+    "cep" : "12345000",
     "district" : "São Paulo",
     "city" : "São Paulo",
     "state" : "São Paulo",
@@ -21,10 +21,10 @@ GET http://localhost:8000/user/vanessa@gmail.com/address/
 
 # Deletando endereço pelo id
 
-DELETE http://localhost:8000/user/vanessa@gmail.com/address/6341e735dcc553df4ebafcc7
+DELETE http://localhost:8000/user/vanessa@gmail.com/address/6347724474aa1592e7aaacbc
 
 ###
 
 # Busca um endereço do usuário pelo id
 
-GET http://localhost:8000/user/vanessa@gmail.com/address/6341e735dcc553df4ebafcc7
+GET http://localhost:8000/user/vanessa@gmail.com/address/6347725674aa1592e7aaacbe
