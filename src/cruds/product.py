@@ -3,6 +3,7 @@ import pydantic
 
 from bson import ObjectId
 from fastapi import status, HTTPException
+from src.cruds.order import delete_product_from_opened_orders
 from src.schemas.products import ProductSchema
 from src.server.database import db
 from src.server.validation import validate_object_id
@@ -13,7 +14,7 @@ logger = logging.getLogger(__name__)
 async def create_product(product: ProductSchema):
 
     #Verifica se produto já existe
-    product_db = await get_product_by_name(product.name)
+    product_db = await get_product_by_name(product.name, 0, 1)
     if product_db:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="message': 'Product already registered")
     
@@ -30,10 +31,10 @@ async def create_product(product: ProductSchema):
 
 
 async def delete_product(product_id: str):
-    # TODO: Fazer consulta em todos os carrinhos abertos para poder excluir o produto.
     try:
         product = await db.products_db.find_one({'_id': ObjectId(product_id)})
         if product:
+            await delete_product_from_opened_orders(product_id)
             await db.products_db.delete_one({'_id': ObjectId(product_id)})
             return product
     except Exception as e:

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status
 from src.schemas.users import UserSchema
-from src.cruds.user import create_user, get_user_by_email
+from src.cruds.user import create_user, get_user_by_email, delete_user_by_id
 from starlette.responses import JSONResponse
 from pydantic.networks import EmailStr
 
@@ -17,7 +17,12 @@ async def create_new_user(user: UserSchema):
 
 @router.get("/{user_email}")
 async def get_user(user_email: EmailStr):
-    print(user_email)
     user_by_email = await get_user_by_email(user_email)
     print(user_by_email)
     return JSONResponse(content={'data': {'user': parse_json(user_by_email)}}, status_code=status.HTTP_200_OK)
+
+
+@router.delete("/{user_id}")
+async def delete_user(user_id: str):
+    await delete_user_by_id(user_id)
+    return JSONResponse(content={'data': 'User deleted'}, status_code=status.HTTP_200_OK)

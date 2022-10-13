@@ -7,3 +7,4 @@ class AddressSchema(BaseModel):
     city: str
     state: str
     is_delivery: bool = Field(default=True)
+    is_active: bool = Field(default=True)

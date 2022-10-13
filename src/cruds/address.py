@@ -79,11 +79,16 @@ async def remove_address_by_id(user_email: str, address_id: str):
     address = [v for v in address_list if v['_id'] == ObjectId(address_id)]
     if len(address) < 1:
         raise HTTPException(detail='Endereço não encontrado', status_code=status.HTTP_404_NOT_FOUND)
-    updated_address_list = [v for v in address_list if v['_id'] != ObjectId(address_id)]
-    updated_address_list = await db.addresses_db.update_one(
-        {'_id': user_address['_id']},
-        {'$set': {'address': updated_address_list}}
-    )
+    try:
+        updated_address_list = [v for v in address_list if v['_id'] != ObjectId(address_id)]
+        updated_address_list = await db.addresses_db.update_one(
+            {'_id': user_address['_id']},
+            {'$set': {'address': updated_address_list}}
+        )
+    except Exception as e:
+        logger.exception(f'remove_address_by_id.error: {e}')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+    
     if updated_address_list.modified_count:
         return {}
     raise HTTPException(status_code=status.HTTP_304_NOT_MODIFIED)
@@ -91,10 +96,14 @@ async def remove_address_by_id(user_email: str, address_id: str):
 
 
 async def get_delivery_address(user_email):
-    pipeline = [
-        {'$match': {'user.email': user_email }},
-        {'$unwind': '$address'},
-        {'$match': {'address.is_delivery': True}}
-    ]
-    return await db.addresses_db.aggregate(pipeline).to_list(length=None)
- 
+    try:
+        pipeline = [
+            {'$match': {'user.email': user_email }},
+            {'$unwind': '$address'},
+            {'$match': {'address.is_delivery': True}}
+        ]
+        return await db.addresses_db.aggregate(pipeline).to_list(length=None)
+    except Exception as e:
+        logger.exception(f'get_delivery_address.error: {e}')
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+

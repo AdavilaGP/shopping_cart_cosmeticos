@@ -1,3 +1,4 @@
+#Cadastro do usuário
 POST http://localhost:8000/users/
 
 {
@@ -8,6 +9,7 @@ POST http://localhost:8000/users/
 }
 
 ###
+#Cadastro com senha muito curta
 POST http://localhost:8000/users/
 
 {
@@ -17,5 +19,14 @@ POST http://localhost:8000/users/
     "is_admin": false
 }
 
+#Busca com email valido
 ###
 GET http://localhost:8000/users/ada.teste@gmail.com
+
+#Busca com email inexistente
+###
+GET http://localhost:8000/users/aka.teste@gmail.com
+
+#Apagar usuário
+###
+DELETE http://localhost:8000/users/63476dafca49a6eb9e9ba6ab

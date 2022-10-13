@@ -1,0 +1,43 @@
+# Criando pedido / Adicionando item a um pedido aberto
+POST http://localhost:8000/orders/vanessa@gmail.com
+
+{
+    "product_id": "63476d87ca49a6eb9e9ba6aa",
+    "product_quantity": 2
+}
+
+###
+
+# Buscando por pedido aberto do usuário
+GET http://localhost:8000/orders/vanessa@gmail.com/order/?order_status=opened
+
+###
+
+# Buscando por pedidos fechados do usuário
+
+GET http://localhost:8000/orders/vanessa@gmail.com/order/?order_status=closed
+
+###
+
+# Passando o parâmetro opcional orders_quantity que retorna apenas a quantidade
+# de pedidos encontrados para o usuário
+
+GET http://localhost:8000/orders/vanessa@gmail.com/order/?order_status=closed&orders_quantity=true
+
+###
+
+# Removendo um item do pedido aberto
+
+DELETE http://localhost:8000/orders/vanessa@gmail.com/order/?product_id=63476d87ca49a6eb9e9ba6aa&product_quantity=1
+
+###
+
+# Excluindo um pedido (aberto ou fechado) e removendo os itens dele
+
+DELETE http://localhost:8000/orders/vanessa@gmail.com/order/6346d034e397bab6e1d103e6
+
+###
+
+# Atualizando um pedido aberto para fechado (paid=False -> Aberto, paid=True -> fechado)
+
+PUT http://localhost:8000/orders/vanessa@gmail.com/order/634772f174aa1592e7aaacc0
