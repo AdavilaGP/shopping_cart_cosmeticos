@@ -43,10 +43,26 @@ async def get_user_by_email(user_email):
 
 
 async def delete_user_by_id(user_id):
-    print(user_id)
     user = await db.users_db.find_one({'_id': ObjectId(user_id)})
-    if user:
-        db.users_db.update_one({'_id': ObjectId(user_id)}, {'$set': {'is_active': False}})
-        return
-    raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="message': 'User do not exist'")
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado")
+    
+    try:
+        await db.users_db.update_one({'_id': ObjectId(user_id)}, {'$set': {'is_active': False}})
+        addresses = await db.addresses_db.find_one({'user._id': user['_id']}, {'address': 1})
+        if addresses:
+            for address in addresses['address']:
+                await db.addresses_db.update_many({'address._id': address['_id']}, {'$set': {'address.$.is_active': False}})
 
+        user_orders = await db.orders_db.find({'user_id': user['_id']}).to_list(length=None)
+        if user_orders:
+            for order in user_orders:
+                await db.order_items_db.delete_many({'order_id': ObjectId(order['_id'])})
+                await db.orders_db.delete_many({'user_id': ObjectId(user_id)})  
+
+        return {}
+    except Exception as e:
+        print(f"delete_user_by_id.error: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)  
+    
+    

@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 async def create_product(product: ProductSchema):
 
     #Verifica se produto já existe
-    product_db = await get_product_by_name(product.name)
+    product_db = await get_product_by_name(product.name, 0, 1)
     if product_db:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="message': 'Product already registered")
     

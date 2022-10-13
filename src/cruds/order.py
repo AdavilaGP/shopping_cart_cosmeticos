@@ -260,6 +260,7 @@ async def remove_order_by_id(user_email, order_id):
         logger.exception(f'remove_order_by_id.error: {e}')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
+
 async def delete_product_from_opened_orders(product_id):
     try:
         opened_orders = await db.orders_db.find({'paid': False}).to_list(length=None)
@@ -271,3 +272,4 @@ async def delete_product_from_opened_orders(product_id):
     except Exception as e:
         logger.exception(f'delete_product_from_opened_orders: {e}')
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
+

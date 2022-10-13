@@ -1,0 +1,35 @@
+#Cadastrar um produto
+POST http://localhost:8000/products/
+
+{
+    "name": "Libre Yves Saint Laurent",
+    "category":  "perfume",
+    "brand": "Yves Saint Laurent",
+    "description": "A nova fragrância da liberdade, uma fragrância de declaração para quem vive de acordo com suas próprias regras. Libre Eau de Parfum é a nova fragrância da liberdade, uma fragrância de declaração para quem vive de acordo com suas próprias regras. Uma reinvenção do perfume floral, combina a Essência de Lavanda da França com a sensualidade da Flor de Laranjeira Marroquina, para uma fusão floral única complementada por uma nota ousada do Acordo de Almíscar. Libre significa livre. É uma celebração da liberdade: uma fragrância para quem faz o que quer e ousa ser exatamente quem é. A garrafa é uma declaração de alta costura com uma tampa assimétrica preta como um vestido sexy de alta costura, correntes de ouro em volta do pescoço que lembram os icônicos sacos YSL it, complementados com o atemporal logotipo Yves Saint Laurent.",
+    "price": 309,
+    "inventory": 20
+}
+
+###
+#Buscar produto por id
+GET http://localhost:8000/products/6347331bde250a5a8bcc8e85
+
+###
+#Buscar productos por nome, com limite de 5 produtos
+GET http://localhost:8000/products/name/perfume/?limit=5
+
+###
+#Deletar produto
+DELETE http://localhost:8000/products/6341b788a80ff09eee2e36c5
+
+###
+#Atualizar informações de um produto
+PUT http://127.0.0.1:8000/products/634736d81cfb2e6a1a79a5ac
+
+{
+    "name": "Good Girl Carolina Herrera ",
+    "category":  "perfume",
+    "brand": "Carolina Herrera",
+    "price": 379,
+    "inventory": 10
+}
