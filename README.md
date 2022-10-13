@@ -77,6 +77,7 @@ http://localhost:8000/docs
   <li>Fazer verificação de estoque ao adicionar ou remover um item do pedido.</li>
   <li>Implementar recursos de autorização e autenticação usando JWT.</li>
 </ul>
+
 ## :handshake: Colaboradoras
 <table>
   <tr>
@@ -125,3 +126,6 @@ http://localhost:8000/docs
 
 ## :dart: Status do projeto
 Concluído.
+<a href="https://shopping-cart-cosmeticos-api.herokuapp.com/docs#/" targt="_blank">Deploy</a> 
+<a href="https://app.swaggerhub.com/apis-docs/CAMILASENNA/ShoppingCartCosmeticos/1.0.0#/">Documentação no Swagger</a>
+
